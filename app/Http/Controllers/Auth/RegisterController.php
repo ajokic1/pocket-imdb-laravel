@@ -63,6 +63,7 @@ class RegisterController extends Controller
      */
     protected function create()
     {
+        $this->validator(request()->all())->validate();
         return User::create([
             'name' => request('name'),
             'email' => request('email'),
