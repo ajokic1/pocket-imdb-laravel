@@ -21,11 +21,18 @@ class MovieController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Movie[]|\Illuminate\Database\Eloquent\Collection
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Movie::all();
+        return $this->search($request)->paginate(10);
+    }
+
+    private function search(Request $request) {
+        $search = strtolower($request->search);
+
+        return Movie::whereRaw("lower(title) like (?)", ["%$search%"]);
     }
 
     /**
