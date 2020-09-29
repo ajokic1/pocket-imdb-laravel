@@ -72,4 +72,11 @@ class MovieController extends Controller
     {
         //
     }
+
+    public function visit(Movie $movie)
+    {
+        $movie->visits++;
+        $movie->save();
+        return $movie;
+    }
 }
