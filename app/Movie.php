@@ -20,10 +20,10 @@ class Movie extends Model
 
     public function getLikeValueAttribute()
     {
-        return Like::where('movie_id', $this->id)
+        $like = Like::where('movie_id', $this->id)
             ->where('user_id', auth()->user()->id)
-            ->first()
-            ->value;
+            ->first();
+        return $like ? $like->value : 0;
     }
 
     public function liked_by()
