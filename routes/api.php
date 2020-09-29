@@ -25,3 +25,4 @@ Route::group([
 });
 
 Route::apiResource('movies', 'Api\MovieController');
+Route::apiResource('movies/{movie}/comments', 'Api\CommentController');
