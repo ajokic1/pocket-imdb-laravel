@@ -28,7 +28,7 @@ class CommentController extends Controller
      */
     public function index(Movie $movie)
     {
-        return $movie->comments()->get();
+        return $movie->comments()->with('user:id,name')->get();
     }
 
     /**
