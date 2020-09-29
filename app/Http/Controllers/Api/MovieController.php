@@ -21,11 +21,21 @@ class MovieController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Movie[]|\Illuminate\Database\Eloquent\Collection
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Movie::paginate(10);
+        return $this->search($request)->paginate(10);
+    }
+
+    private function search(Request $request) {
+        $search = strtolower($request->search);
+        $genre_id = $request->genre_id;
+        $query = Movie::select();
+        if($genre_id) $query = $query->where('genre_id', $genre_id);
+        if($search) $query = $query->whereRaw("lower(title) like (?)", ["%$search%"]);
+        return $query;
     }
 
     /**
