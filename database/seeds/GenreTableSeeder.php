@@ -3,7 +3,7 @@
 use App\Genre;
 use Illuminate\Database\Seeder;
 
-class GenreSeeder extends Seeder
+class GenreTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -24,10 +24,10 @@ class GenreSeeder extends Seeder
             'Thriller',
             'Western',
         ];
-
+        $data = [];
         foreach ($genres as $genre) {
-            Genre::create(['name' => $genre]);
+            array_push($data, ['name' => $genre]);
         }
-
+        Genre::insert($data);
     }
 }

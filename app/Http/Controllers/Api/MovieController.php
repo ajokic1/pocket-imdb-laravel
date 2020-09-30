@@ -29,16 +29,7 @@ class MovieController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->search($request)->paginate(10);
-    }
-
-    private function search(Request $request) {
-        $search = strtolower($request->search);
-        $genre_id = $request->genre_id;
-        $query = Movie::select();
-        if($genre_id) $query = $query->where('genre_id', $genre_id);
-        if($search) $query = $query->whereRaw("lower(title) like (?)", ["%$search%"]);
-        return $query;
+        return Movie::search($request)->paginate(10);
     }
 
     /**
