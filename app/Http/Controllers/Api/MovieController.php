@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Like;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Movie;
+use phpDocumentor\Reflection\DocBlock\Tags\Author;
 
 class MovieController extends Controller
 {
@@ -21,11 +24,12 @@ class MovieController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Movie[]|\Illuminate\Database\Eloquent\Collection
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Movie::paginate(10);
+        return Movie::search($request)->paginate(10);
     }
 
     /**
@@ -42,12 +46,15 @@ class MovieController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Movie $movie
+     * @return Movie
      */
-    public function show($id)
+    public function show(Movie $movie)
     {
-        //
+        $movie->visits++;
+        $movie->save();
+
+        return $movie;
     }
 
     /**
@@ -71,5 +78,33 @@ class MovieController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function like(Movie $movie)
+    {
+        $this->setLike($movie, auth()->user(), 1);
+        return $movie;
+    }
+
+    public function dislike(Movie $movie)
+    {
+        $this->setLike($movie, auth()->user(), -1);
+        return $movie;
+    }
+
+    public function unlike(Movie $movie)
+    {
+        $this->setLike($movie, auth()->user(), 0);
+        return $movie;
+    }
+
+    private function setLike(Movie $movie, User $user, $value) {
+        $like = Like::where('user_id', $user->id)->where('movie_id', $movie->id)->first();
+        if (!$like) $like = Like::make([
+            'user_id' => $user->id,
+            'movie_id' => $movie->id
+        ]);
+        $like->value = $value;
+        $like->save();
     }
 }
