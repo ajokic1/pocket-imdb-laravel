@@ -30,3 +30,8 @@ Route::get('genres', 'Api\GenreController@index');
 Route::post('movies/{movie}/like', 'Api\MovieController@like');
 Route::post('movies/{movie}/dislike', 'Api\MovieController@dislike');
 Route::post('movies/{movie}/unlike', 'Api\MovieController@unlike');
+
+Route::get('watchlist', 'Api\WatchlistController@get');
+Route::post('watchlist/add/{movie}', 'Api\WatchlistController@add');
+Route::post('watchlist/remove/{movie}', 'Api\WatchlistController@remove');
+Route::post('watchlist/watched/{movie}/{watched}', 'Api\WatchlistController@setWatched');

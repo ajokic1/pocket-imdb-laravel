@@ -62,4 +62,12 @@ class User extends Authenticatable implements JWTSubject
                 'value'
             ]);
     }
+
+    public function watchlist()
+    {
+        return $this->belongsToMany(Movie::class, 'watchlists')
+            ->withPivot([
+                'watched'
+            ]);
+    }
 }
