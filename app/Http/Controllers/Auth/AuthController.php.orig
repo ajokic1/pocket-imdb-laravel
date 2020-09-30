@@ -15,7 +15,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'refresh']]);
+        $this->middleware('auth:api', ['except' => ['login']]);
     }
 
     /**
@@ -32,8 +32,8 @@ class AuthController extends Controller
         if (! $token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        return $this->respondWithTokenAndUser($token);
+        
+        return $this->respondWithToken($token);
     }
 
     /**
@@ -81,26 +81,12 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
-        ]);
-    }
-
-    /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithTokenAndUser($token)
-    {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
             'name' => auth()->user()->name,
             'email' => auth()->user()->email,
         ]);
     }
+<<<<<<< HEAD
+=======
 
     /**
      * Get a validator for an incoming registration request.
@@ -115,4 +101,5 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
     }
+>>>>>>> master
 }

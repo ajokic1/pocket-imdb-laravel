@@ -25,3 +25,6 @@ Route::group([
 });
 
 Route::apiResource('movies', 'Api\MovieController');
+Route::post('movies/{movie}/like', 'Api\MovieController@like');
+Route::post('movies/{movie}/dislike', 'Api\MovieController@dislike');
+Route::post('movies/{movie}/unlike', 'Api\MovieController@unlike');
