@@ -40,10 +40,11 @@ class CommentController extends Controller
      */
     public function store(StoreComment $request, Movie $movie)
     {
-        $validated = $request->validated();
-        $validated['user_id'] = auth()->user()->id;
-        $validated['movie_id'] = $movie->id;
-        return response()->json(Comment::create($validated), 201);
+        $comment = Comment::make($request->validated());
+        $comment->movie_id = $movie->id;
+        auth()->user()->save($comment);
+
+        return response()->json($comment, 201);
     }
 
     /**
@@ -67,6 +68,7 @@ class CommentController extends Controller
     public function update(StoreComment $request, Comment $comment)
     {
         $comment->update($request->validated());
+
         return response()->json($comment, 200);
     }
 
@@ -79,6 +81,7 @@ class CommentController extends Controller
     public function destroy(Comment $comment)
     {
         $comment->delete();
+
         return response()->json([], 200);
     }
 }
