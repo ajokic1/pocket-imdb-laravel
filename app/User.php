@@ -48,4 +48,12 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function liked_movies() {
+        return $this->belongsToMany(Movie::class, 'likes')
+            ->using(Like::class)
+            ->withPivot([
+                'value'
+            ]);
+    }
 }
