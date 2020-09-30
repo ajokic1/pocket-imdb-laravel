@@ -32,7 +32,7 @@ class AuthController extends Controller
         if (! $token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
+        
         return $this->respondWithToken($token);
     }
 
@@ -85,6 +85,8 @@ class AuthController extends Controller
             'email' => auth()->user()->email,
         ]);
     }
+<<<<<<< HEAD
+=======
 
     /**
      * Get a validator for an incoming registration request.
@@ -99,4 +101,5 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
     }
+>>>>>>> master
 }
