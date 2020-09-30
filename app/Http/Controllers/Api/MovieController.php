@@ -29,13 +29,7 @@ class MovieController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->search($request)->paginate(10);
-    }
-
-    private function search(Request $request) {
-        $search = strtolower($request->search);
-
-        return Movie::whereRaw("lower(title) like (?)", ["%$search%"]);
+        return Movie::search($request)->paginate(10);
     }
 
     /**
@@ -55,7 +49,7 @@ class MovieController extends Controller
      * @param Movie $movie
      * @return Movie
      */
-    public function show(Movie $movie)
+    public function show($id)
     {
         $movie->visits++;
         $movie->save();

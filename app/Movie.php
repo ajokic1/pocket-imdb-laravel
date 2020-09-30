@@ -3,10 +3,20 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class Movie extends Model
 {
     protected $appends = ['likes', 'dislikes', 'like_value'];
+
+    public static function search(Request $request) {
+        $search = strtolower($request->search);
+        $genre_id = $request->genre_id;
+        $query = Movie::select();
+        if($genre_id) $query = $query->where('genre_id', $genre_id);
+        if($search) $query = $query->whereRaw("lower(title) like (?)", ["%$search%"]);
+        return $query;
+    }
 
     public function getDislikesAttribute()
     {

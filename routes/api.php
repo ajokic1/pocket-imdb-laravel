@@ -25,6 +25,7 @@ Route::group([
 });
 
 Route::apiResource('movies', 'Api\MovieController');
+Route::get('genres', 'Api\GenreController@index');
 Route::post('movies/{movie}/like', 'Api\MovieController@like');
 Route::post('movies/{movie}/dislike', 'Api\MovieController@dislike');
 Route::post('movies/{movie}/unlike', 'Api\MovieController@unlike');
