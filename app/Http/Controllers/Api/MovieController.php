@@ -52,12 +52,15 @@ class MovieController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Movie $movie
+     * @return Movie
      */
-    public function show($id)
+    public function show(Movie $movie)
     {
-        //
+        $movie->visits++;
+        $movie->save();
+
+        return $movie;
     }
 
     /**
