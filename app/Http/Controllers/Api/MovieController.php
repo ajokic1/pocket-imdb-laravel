@@ -47,6 +47,9 @@ class MovieController extends Controller
      */
     public function show(Movie $movie)
     {
+        $movie->visits++;
+        $movie->save();
+
         return $movie;
     }
 
@@ -71,12 +74,5 @@ class MovieController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function visit(Movie $movie)
-    {
-        $movie->visits++;
-        $movie->save();
-        return $movie;
     }
 }

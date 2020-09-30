@@ -25,4 +25,3 @@ Route::group([
 });
 
 Route::apiResource('movies', 'Api\MovieController');
-Route::post('movies/{movie}/visit', 'Api\MovieController@visit');
