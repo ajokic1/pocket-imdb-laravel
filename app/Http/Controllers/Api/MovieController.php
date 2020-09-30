@@ -49,7 +49,7 @@ class MovieController extends Controller
      * @param Movie $movie
      * @return Movie
      */
-    public function show($id)
+    public function show(Movie $movie)
     {
         $movie->visits++;
         $movie->save();
