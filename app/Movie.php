@@ -7,12 +7,15 @@ use Illuminate\Http\Request;
 
 class Movie extends Model
 {
-    public function comments() {
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
+    }
 
     protected $appends = ['likes', 'dislikes', 'like_value'];
 
-    public static function search(Request $request) {
+    public static function search(Request $request)
+    {
         $search = strtolower($request->search);
         $genre_id = $request->genre_id;
         $query = Movie::select();

@@ -28,7 +28,7 @@ class CommentController extends Controller
      */
     public function index(Movie $movie)
     {
-        return $movie->comments()->with('user:id,name')->get();
+        return $movie->comments()->with('user:id,name')->paginate(5);
     }
 
     /**
@@ -42,9 +42,9 @@ class CommentController extends Controller
     {
         $comment = Comment::make($request->validated());
         $comment->movie_id = $movie->id;
-        auth()->user()->save($comment);
+        auth()->user()->comments()->save($comment);
 
-        return response()->json($comment, 201);
+        return response()->json($comment->load('user:id,name'), 201);
     }
 
     /**
