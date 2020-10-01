@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Like;
-use App\User;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Like;
 use App\Movie;
-use phpDocumentor\Reflection\DocBlock\Tags\Author;
+use App\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class MovieController extends Controller
 {
@@ -25,7 +26,7 @@ class MovieController extends Controller
      * Display a listing of the resource.
      *
      * @param Request $request
-     * @return Movie[]|\Illuminate\Database\Eloquent\Collection
+     * @return Movie[]|Collection
      */
     public function index(Request $request)
     {
@@ -35,8 +36,8 @@ class MovieController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -60,9 +61,9 @@ class MovieController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return Response
      */
     public function update(Request $request, $id)
     {
@@ -72,18 +73,39 @@ class MovieController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
     public function destroy($id)
     {
         //
     }
 
+    public function popular()
+    {
+        return Movie::select(['id', 'title'])
+            ->withCount('liked_by')
+            ->orderBy('liked_by_count', 'desc')
+            ->take(10)
+            ->get()
+            ->makeHidden(['dislikes', 'like_value', 'watched', 'in_watchlist','liked_by_count']);
+    }
+
     public function like(Movie $movie)
     {
         $this->setLike($movie, auth()->user(), 1);
         return $movie;
+    }
+
+    private function setLike(Movie $movie, User $user, $value)
+    {
+        $like = Like::where('user_id', $user->id)->where('movie_id', $movie->id)->first();
+        if (!$like) $like = Like::make([
+            'user_id' => $user->id,
+            'movie_id' => $movie->id
+        ]);
+        $like->value = $value;
+        $like->save();
     }
 
     public function dislike(Movie $movie)
@@ -96,15 +118,5 @@ class MovieController extends Controller
     {
         $this->setLike($movie, auth()->user(), 0);
         return $movie;
-    }
-
-    private function setLike(Movie $movie, User $user, $value) {
-        $like = Like::where('user_id', $user->id)->where('movie_id', $movie->id)->first();
-        if (!$like) $like = Like::make([
-            'user_id' => $user->id,
-            'movie_id' => $movie->id
-        ]);
-        $like->value = $value;
-        $like->save();
     }
 }
