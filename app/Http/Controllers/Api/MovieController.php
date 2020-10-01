@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreMovie;
 use App\Like;
 use App\Movie;
 use App\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -36,12 +38,12 @@ class MovieController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
-     * @return Response
+     * @param StoreMovie $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(StoreMovie $request)
     {
-        //
+        return response()->json(Movie::create($request->validated()), 201);
     }
 
     /**
@@ -62,24 +64,28 @@ class MovieController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param int $id
-     * @return Response
+     * @param StoreMovie $request
+     * @param Movie $movie
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(StoreMovie $request, Movie $movie)
     {
-        //
+        $movie->update($request->validated());
+
+        return response()->json($movie, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return Response
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(Movie $movie)
     {
-        //
+        $movie->delete();
+
+        return response()->json([], 200);
     }
 
     public function popular()
