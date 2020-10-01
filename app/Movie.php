@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class Movie extends Model
 {
-    protected $appends = ['likes', 'dislikes', 'like_value', 'watched'];
+    protected $appends = ['likes', 'dislikes', 'like_value', 'watched', 'in_watchlist'];
 
     public static function search(Request $request)
     {
@@ -46,7 +46,8 @@ class Movie extends Model
 
     public function getWatchedAttribute()
     {
-        return $this->watchlisted_by()->where('user_id', auth()->user()->id)->first()->pivot->watched;
+        $user = $this->watchlisted_by()->where('user_id', auth()->user()->id)->first();
+        return $user ? $user->pivot->watched : false;
     }
 
     public function watchlisted_by()
@@ -63,5 +64,11 @@ class Movie extends Model
             ->where('user_id', auth()->user()->id)
             ->first();
         return $like ? $like->value : 0;
+    }
+
+    public function getInWatchlistAttribute()
+    {
+        return $this->watchlisted_by()->where('user_id', auth()->user()->id)->exists();
+
     }
 }
