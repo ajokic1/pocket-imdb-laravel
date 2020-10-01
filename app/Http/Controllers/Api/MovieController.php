@@ -54,6 +54,7 @@ class MovieController extends Controller
     {
         $movie->visits++;
         $movie->save();
+        $movie['related'] = $movie->related;
 
         return $movie;
     }
@@ -94,6 +95,7 @@ class MovieController extends Controller
     public function like(Movie $movie)
     {
         $this->setLike($movie, auth()->user(), 1);
+
         return $movie;
     }
 
@@ -111,12 +113,14 @@ class MovieController extends Controller
     public function dislike(Movie $movie)
     {
         $this->setLike($movie, auth()->user(), -1);
+
         return $movie;
     }
 
     public function unlike(Movie $movie)
     {
         $this->setLike($movie, auth()->user(), 0);
+
         return $movie;
     }
 }

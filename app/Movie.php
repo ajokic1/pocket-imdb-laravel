@@ -69,6 +69,15 @@ class Movie extends Model
     public function getInWatchlistAttribute()
     {
         return $this->watchlisted_by()->where('user_id', auth()->user()->id)->exists();
+    }
 
+    public function getRelatedAttribute()
+    {
+        return Movie::select(['id', 'title'])
+            ->where('genre_id', $this->genre_id)
+            ->where('id', '!=', $this->id)
+            ->take(10)
+            ->get()
+            ->makeHidden(['dislikes', 'like_value', 'watched', 'in_watchlist','liked_by_count']);
     }
 }
