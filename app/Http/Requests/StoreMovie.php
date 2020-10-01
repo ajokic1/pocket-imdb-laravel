@@ -27,6 +27,7 @@ class StoreMovie extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'image_url' => 'required|string',
+            'genre_id' => 'required|exists:genres,id',
         ];
     }
 }

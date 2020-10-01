@@ -9,7 +9,7 @@ class Movie extends Model
 {
     protected $appends = ['likes', 'dislikes', 'like_value', 'watched', 'in_watchlist'];
 
-    protected $fillable = ['title', 'description', 'image_url'];
+    protected $fillable = ['title', 'description', 'image_url', 'genre_id'];
 
     public static function search(Request $request)
     {
