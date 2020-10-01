@@ -24,6 +24,7 @@ Route::group([
     Route::post('register', 'Auth\RegisterController@create');
 });
 
+Route::get('movies/popular', 'Api\MovieController@popular');
 Route::apiResource('movies', 'Api\MovieController');
 Route::apiResource('movies/{movie}/comments', 'Api\CommentController');
 Route::get('genres', 'Api\GenreController@index');
