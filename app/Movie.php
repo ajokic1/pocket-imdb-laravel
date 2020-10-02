@@ -2,21 +2,24 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class Movie extends Model
 {
-    protected $appends = ['likes', 'dislikes', 'like_value', 'watched', 'in_watchlist'];
+    protected $appends = ['genre_ids', 'likes', 'dislikes', 'like_value', 'watched', 'in_watchlist'];
 
-    protected $fillable = ['title', 'description', 'image_url', 'genre_id'];
+    protected $fillable = ['title', 'description', 'image_url'];
 
     public static function search(Request $request)
     {
         $search = strtolower($request->search);
         $genre_id = $request->genre_id;
         $query = Movie::select();
-        if ($genre_id) $query = $query->where('genre_id', $genre_id);
+        if ($genre_id) $query = $query->whereHas('genres', function (Builder $query) use ($genre_id) {
+            $query->where('genres.id', $genre_id);
+        });
         if ($search) $query = $query->whereRaw("lower(title) like (?)", ["%$search%"]);
 
         return $query;
@@ -75,11 +78,29 @@ class Movie extends Model
 
     public function getRelatedAttribute()
     {
-        return Movie::select(['id', 'title'])
-            ->where('genre_id', $this->genre_id)
-            ->where('id', '!=', $this->id)
+        $genre_ids = $this->genre_ids;
+
+        return Movie::select(['movies.id', 'title'])
+            ->whereHas('genres', function (Builder $query) use ($genre_ids) {
+                $query->whereIn('genres.id', $genre_ids);
+            })->where('movies.id', '!=', $this->id)
             ->take(10)
             ->get()
-            ->makeHidden(['dislikes', 'like_value', 'watched', 'in_watchlist','liked_by_count']);
+            ->makeHidden(['dislikes', 'like_value', 'watched', 'in_watchlist', 'liked_by_count']);
+    }
+
+    public function getGenreIdsAttribute()
+    {
+        return $this->genres()->pluck('genres.id');
+    }
+
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class);
+    }
+
+    public function getGenreNamesAttribute()
+    {
+        return $this->genres()->pluck('name');
     }
 }

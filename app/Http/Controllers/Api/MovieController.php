@@ -43,7 +43,10 @@ class MovieController extends Controller
      */
     public function store(StoreMovie $request)
     {
-        return response()->json(Movie::create($request->validated()), 201);
+        $movie = Movie::create($request->validated());
+        $movie->genres()->sync($request->genres);
+
+        return response()->json($movie, 201);
     }
 
     /**
@@ -56,6 +59,7 @@ class MovieController extends Controller
     {
         $movie->visits++;
         $movie->save();
+        $movie['genre_names'] = $movie->genre_names;
         $movie['related'] = $movie->related;
 
         return $movie;
@@ -71,6 +75,7 @@ class MovieController extends Controller
     public function update(StoreMovie $request, Movie $movie)
     {
         $movie->update($request->validated());
+        $movie->genres()->sync($request->genre_ids);
 
         return response()->json($movie, 200);
     }
