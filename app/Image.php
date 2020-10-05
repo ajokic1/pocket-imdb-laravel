@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use  Intervention\Image\Facades\Image as InterventionImage;
 
@@ -19,34 +20,34 @@ class Image extends Model
 
     public static function storeMovieImage($movie, $request)
     {
-        if ($request->has('image_url')) {
-            $image = Image::make([
-                'image_url' => $request->image_url,
-            ]);
-        } else {
-            $fileName = uniqid();
+        $file = $request->file('image');
 
-            $file = $request->file('image');
-
-            $thumbnail = InterventionImage::make($file)
-                ->fit(200, 200)
-                ->encode('jpg', 80);
-            $thumbnailPath = "movies/thumbnails/$fileName.jpg";
-            Storage::disk('public')->put($thumbnailPath, $thumbnail);
-
-            $fullSize = InterventionImage::make($file)
-                ->fit(400, 400)
-                ->encode('jpg', 80);
-            $fullSizePath = "movies/full_size/$fileName.jpg";
-            Storage::disk('public')->put($fullSizePath, $fullSize);
+        if ($file) {
+            $thumbnailPath = self::storeResized($file, 'thumbnails', 200);
+            $fullSizePath = self::storeResized($file, 'full_size', 400);
 
             $image = Image::make([
                 'thumbnail' => Storage::url($thumbnailPath),
-                'full' => Storage::url($fullSizePath)
+                'full' => Storage::url($fullSizePath),
+            ]);
+        } else {
+            $image = Image::make([
+                'image_url' => $request->image_url,
             ]);
         }
 
         $movie->image()->save($image);
+    }
+
+    private static function storeResized($file, $folder, $size) {
+        $fileName = uniqid();
+        $image = InterventionImage::make($file)
+            ->fit($size, $size)
+            ->encode('jpg', 80);
+        $path = "movies/$folder/$fileName.jpg";
+        Storage::disk('public')->put($path, $image);
+
+        return $path;
     }
 
     public function getThumbnailUrlAttribute()
@@ -59,7 +60,7 @@ class Image extends Model
     public function getFullUrlAttribute()
     {
         $full = $this->full;
-        
+
         return $full ? asset($full) : $this->image_url;
     }
 }
