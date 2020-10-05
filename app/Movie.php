@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Events\MovieCreated;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -13,6 +14,10 @@ class Movie extends Model
     protected $fillable = ['title', 'description', 'image_url'];
 
     protected $with = ['image'];
+
+    protected $dispatchesEvents = [
+        'created' => MovieCreated::class,
+    ];
 
     public static function search(Request $request)
     {
