@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Genre;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMovie;
+use App\Image;
 use App\Like;
 use App\Movie;
 use App\User;
@@ -44,7 +46,8 @@ class MovieController extends Controller
     public function store(StoreMovie $request)
     {
         $movie = Movie::create($request->validated());
-        $movie->genres()->sync($request->genres);
+        $movie->genres()->sync(Genre::getIdsFromNames($request->genres));
+        Image::storeMovieImage($movie, $request);
 
         return response()->json($movie, 201);
     }

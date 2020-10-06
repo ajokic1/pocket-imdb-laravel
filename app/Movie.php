@@ -12,6 +12,8 @@ class Movie extends Model
 
     protected $fillable = ['title', 'description', 'image_url'];
 
+    protected $with = ['image'];
+
     public static function search(Request $request)
     {
         $search = strtolower($request->search);
@@ -102,5 +104,10 @@ class Movie extends Model
     public function getGenreNamesAttribute()
     {
         return $this->genres()->pluck('name');
+    }
+
+    public function image()
+    {
+        return $this->hasOne(Image::class);
     }
 }
