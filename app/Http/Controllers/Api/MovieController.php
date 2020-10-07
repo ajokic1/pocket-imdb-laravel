@@ -125,7 +125,7 @@ class MovieController extends Controller
         ]);
         $like->value = $value;
         $like->save();
-        broadcast(new NewLikeEvent($movie));
+        broadcast(new NewLikeEvent($movie))->toOthers();
     }
 
     public function dislike(Movie $movie)
