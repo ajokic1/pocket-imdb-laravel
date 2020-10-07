@@ -166,6 +166,7 @@ return [
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
         Elasticquent\ElasticquentServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
 
         /*
          * Package Service Providers...

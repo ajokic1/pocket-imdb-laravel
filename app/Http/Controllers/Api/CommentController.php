@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Comment;
+use App\Events\NewCommentEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreComment;
 use App\Movie;
@@ -43,6 +44,7 @@ class CommentController extends Controller
         $comment = Comment::make($request->validated());
         $comment->movie_id = $movie->id;
         auth()->user()->comments()->save($comment);
+        broadcast(new NewCommentEvent($comment));
 
         return response()->json($comment->load('user:id,name'), 201);
     }

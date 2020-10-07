@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\NewLikeEvent;
 use App\Genre;
 use App\Helpers\CollectionHelper;
 use App\Http\Controllers\Controller;
@@ -124,6 +125,7 @@ class MovieController extends Controller
         ]);
         $like->value = $value;
         $like->save();
+        broadcast(new NewLikeEvent($movie));
     }
 
     public function dislike(Movie $movie)
