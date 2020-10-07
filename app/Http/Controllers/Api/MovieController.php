@@ -123,6 +123,7 @@ class MovieController extends Controller
             'user_id' => $user->id,
             'movie_id' => $movie->id
         ]);
+        if ($like->value == $value) abort(400);
         $like->value = $value;
         $like->save();
         broadcast(new NewLikeEvent($movie))->toOthers();
