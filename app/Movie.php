@@ -3,12 +3,16 @@
 namespace App;
 
 use App\Events\MovieCreated;
+use App\Helpers\CollectionHelper;
+use Elasticquent\ElasticquentTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class Movie extends Model
 {
+    use ElasticquentTrait;
+
     protected $appends = ['genre_ids', 'likes', 'dislikes', 'like_value', 'watched', 'in_watchlist'];
 
     protected $fillable = ['title', 'description', 'image_url'];
@@ -19,17 +23,32 @@ class Movie extends Model
         'created' => MovieCreated::class,
     ];
 
-    public static function search(Request $request)
+    public static function simple_search(Request $request)
     {
-        $search = strtolower($request->search);
+        $title = strtolower($request->title);
         $genre_id = $request->genre_id;
         $query = Movie::select();
         if ($genre_id) $query = $query->whereHas('genres', function (Builder $query) use ($genre_id) {
             $query->where('genres.id', $genre_id);
         });
-        if ($search) $query = $query->whereRaw("lower(title) like (?)", ["%$search%"]);
+        if ($title) $query = $query->whereRaw("lower(title) like (?)", ["%$title%"]);
 
         return $query;
+    }
+
+    public static function elastic_search(Request $request)
+    {
+        $query = [];
+
+        if ($request->title) {
+            $query['body']['query']['bool']['must']['fuzzy']['title'] = $request->title;
+        }
+
+        if ($request->genre_id) {
+            $query['body']['query']['bool']['filter']['term']['genre_ids'] = $request->genre_id;
+        }
+
+        return collect(Movie::complexSearch($query));
     }
 
     public function comments()
@@ -58,6 +77,7 @@ class Movie extends Model
 
     public function getWatchedAttribute()
     {
+        if (!auth()->user()) return null;
         $user = $this->watchlisted_by()->where('user_id', auth()->user()->id)->first();
         return $user ? $user->pivot->watched : false;
     }
@@ -72,6 +92,7 @@ class Movie extends Model
 
     public function getLikeValueAttribute()
     {
+        if (!auth()->user()) return null;
         $like = Like::where('movie_id', $this->id)
             ->where('user_id', auth()->user()->id)
             ->first();
@@ -80,6 +101,7 @@ class Movie extends Model
 
     public function getInWatchlistAttribute()
     {
+        if (!auth()->user()) return null;
         return $this->watchlisted_by()->where('user_id', auth()->user()->id)->exists();
     }
 

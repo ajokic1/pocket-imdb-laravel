@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\NewLikeEvent;
 use App\Genre;
+use App\Helpers\CollectionHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMovie;
 use App\Image;
@@ -30,11 +32,11 @@ class MovieController extends Controller
      * Display a listing of the resource.
      *
      * @param Request $request
-     * @return Movie[]|Collection
+     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public function index(Request $request)
     {
-        return Movie::search($request)->paginate(10);
+        return Movie::elastic_search($request)->paginate(10);
     }
 
     /**
@@ -47,6 +49,7 @@ class MovieController extends Controller
     {
         $movie = Movie::create($request->validated());
         $movie->genres()->sync(Genre::getIdsFromNames($request->genres));
+        $movie->addToIndex();
         Image::storeMovieImage($movie, $request);
 
         return response()->json($movie, 201);
@@ -120,8 +123,10 @@ class MovieController extends Controller
             'user_id' => $user->id,
             'movie_id' => $movie->id
         ]);
+        if ($like->value == $value) abort(400);
         $like->value = $value;
         $like->save();
+        broadcast(new NewLikeEvent($movie))->toOthers();
     }
 
     public function dislike(Movie $movie)
