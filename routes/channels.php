@@ -14,3 +14,11 @@
 Broadcast::channel('App.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('movies.{movieId}.comments', function ($user, $movieId) {
+    return true;
+});
+
+Broadcast::channel('movies.{movieId}.likes', function ($user, $movieId) {
+    return true;
+});
