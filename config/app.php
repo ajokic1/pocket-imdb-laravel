@@ -123,6 +123,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'admin_email' => env('APP_ADMIN_EMAIL', 'admin@pocketimdb.test'),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
@@ -228,5 +230,6 @@ return [
         'Image' => Intervention\Image\Facades\Image::class,
 
     ],
+
 
 ];
